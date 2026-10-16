@@ -23,7 +23,7 @@ export function MatchSummary({ gaps }: { gaps: Gaps }) {
             <span className='text-2xl font-semibold tracking-tight text-ink'>
               {coverage}%
             </span>{' '}
-            of the job's skills
+            of required skills
           </p>
         )}
       </div>

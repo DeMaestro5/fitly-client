@@ -14,6 +14,8 @@ import { usePreview } from '../hooks/usePreview';
 import { useTemplates } from '../hooks/useTemplates';
 import { compareResumes } from '../lib/resume-diff';
 import { useResumeSession } from '../state/session';
+import { FitVerdict } from '../components/FitVerdict';
+import { LocationNote } from '../components/LocationNote';
 
 type Tab = 'preview' | 'changes';
 
@@ -33,6 +35,9 @@ function Result({ result }: { result: TailorResult }) {
     reload,
   } = useMasterResume();
   const [tab, setTab] = useState<Tab>('preview');
+  const [fileName, setFileName] = useState(
+    result.suggestedFileName ?? 'Resume'
+  );
   const { ref, box, animate } = useIndicator<HTMLDivElement>(tab);
 
   // Fall back to the first template when nothing (or a removed one) is saved.
@@ -50,6 +55,15 @@ function Result({ result }: { result: TailorResult }) {
   const preview = usePreview(tailorable, activeId);
   const pdf = useDownload();
 
+  function download() {
+    if (!activeId || pdf.status === 'working') return;
+    pdf.download({
+      tailorable,
+      templateId: activeId,
+      fileName: fileName.trim() || undefined,
+    });
+  }
+
   const changes = useMemo(
     () =>
       master
@@ -61,6 +75,12 @@ function Result({ result }: { result: TailorResult }) {
   return (
     <main className='mx-auto grid max-w-[90rem] gap-6 px-5 pb-6 pt-6 sm:px-8 lg:h-[calc(100vh-4.625rem)] lg:grid-cols-[21rem_minmax(0,1fr)]'>
       <aside className='space-y-8 lg:overflow-y-auto lg:pb-4 lg:pr-3'>
+        <div className='space-y-3'>
+          {result.fit && (
+            <FitVerdict fit={result.fit} constraints={result.constraints} />
+          )}
+          <LocationNote location={result.location} />
+        </div>
         {result.gaps && <MatchSummary gaps={result.gaps} />}
 
         {templatesError ? (
@@ -95,7 +115,7 @@ function Result({ result }: { result: TailorResult }) {
         className='flex min-h-[75vh] min-w-0 flex-col lg:min-h-0'
         aria-label='Result'
       >
-        <div className='mb-3 flex items-center justify-between gap-3'>
+        <div className='mb-3 flex flex-wrap items-center justify-between gap-3'>
           <div
             ref={ref}
             role='tablist'
@@ -129,35 +149,46 @@ function Result({ result }: { result: TailorResult }) {
             )}
           </div>
 
-          <Button
-            disabled={!activeId}
-            busy={pdf.status === 'working'}
-            onClick={() =>
-              activeId && pdf.download({ tailorable, templateId: activeId })
-            }
-          >
-            {pdf.status === 'done' && (
-              <svg
-                viewBox='0 0 20 20'
-                className='size-4 animate-pop'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2.4'
-                aria-hidden='true'
-              >
-                <path
-                  d='m5 10.5 3.2 3.2L15 6.8'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-            {pdf.status === 'working'
-              ? 'Preparing PDF'
-              : pdf.status === 'done'
-              ? 'Downloaded'
-              : 'Download PDF'}
-          </Button>
+          <div className='flex items-center gap-2'>
+            <div className='flex h-10 items-center rounded-xl bg-white ring-1 ring-inset ring-line transition focus-within:ring-2'>
+              <input
+                aria-label='File name'
+                value={fileName}
+                spellCheck={false}
+                onChange={(e) => setFileName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && download()}
+                className='h-full w-40 bg-transparent pl-3 text-sm outline-none sm:w-65 '
+              />
+              <span className='pr-3 text-sm text-muted'>.pdf</span>
+            </div>
+            <Button
+              disabled={!activeId}
+              busy={pdf.status === 'working'}
+              onClick={download}
+            >
+              {pdf.status === 'done' && (
+                <svg
+                  viewBox='0 0 20 20'
+                  className='size-4 animate-pop'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2.4'
+                  aria-hidden='true'
+                >
+                  <path
+                    d='m5 10.5 3.2 3.2L15 6.8'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+              {pdf.status === 'working'
+                ? 'Preparing PDF'
+                : pdf.status === 'done'
+                ? 'Downloaded'
+                : 'Download PDF'}
+            </Button>
+          </div>
         </div>
 
         {tab === 'preview' && (

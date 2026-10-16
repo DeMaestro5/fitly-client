@@ -68,8 +68,7 @@ body {
 
 /* Preserve visible keyboard focus on other interactive elements. */
 :focus-visible:not(textarea) {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 /* The loading sheet: grey lines that get highlighted one after another. */
 .sheet-line {

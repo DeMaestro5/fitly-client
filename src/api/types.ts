@@ -88,6 +88,13 @@ export interface Gaps {
   coverage: number | null;
 }
 
+export type LocationScope = 'worldwide' | 'restricted' | 'unclear';
+
+export interface PostingLocation {
+  scope: LocationScope;
+  detail: string | null;
+}
+
 export interface TailorResult {
   tailorable: Tailorable;
   gaps: Gaps | null;
@@ -95,4 +102,5 @@ export interface TailorResult {
   fit: Fit | null;
   constraints: string[];
   suggestedFileName: string;
+  location: PostingLocation;
 }

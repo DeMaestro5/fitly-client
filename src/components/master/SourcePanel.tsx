@@ -76,7 +76,7 @@ export function SourcePanel({
             <select
               value={templateId ?? ''}
               onChange={(e) => onTemplate(e.target.value)}
-              className='h-9 rounded-md bg-white px-2 text-sm text-ink outline-none ring-1 ring-inset ring-line transition focus:ring-2 focus:ring-focus'
+              className='h-9 rounded-lg bg-white px-2 text-sm text-ink outline-none ring-1 ring-inset ring-line transition focus:ring-2'
             >
               {templates.map((template) => (
                 <option key={template.id} value={template.id}>

@@ -1,4 +1,10 @@
-import type { Gaps, Tailorable, TailorResult, Fit } from '../api/types';
+import type {
+  Gaps,
+  Tailorable,
+  TailorResult,
+  Fit,
+  PostingLocation,
+} from '../api/types';
 
 type Dict = Record<string, unknown>;
 
@@ -55,6 +61,15 @@ function toFit(value: unknown): Fit | null {
   };
 }
 
+function toLocation(value: unknown): PostingLocation {
+  if (!isDict(value)) return { scope: 'unclear', detail: null };
+  const { scope, detail } = value;
+  return {
+    scope: scope === 'worldwide' || scope === 'restricted' ? scope : 'unclear',
+    detail: typeof detail === 'string' && detail.trim() ? detail.trim() : null,
+  };
+}
+
 /**
  * The only place that knows the shape of POST /api/tailor.
  * If the API changes, fix it here and nowhere else.
@@ -87,6 +102,7 @@ export function parseTailorResponse(raw: unknown): TailorResult {
     warnings: toStrings(body.warnings),
     fit: toFit(body.fit),
     constraints: toStrings(posting?.constraints),
+    location: toLocation(posting?.location),
     suggestedFileName:
       typeof body.suggestedFileName === 'string' &&
       body.suggestedFileName.trim()

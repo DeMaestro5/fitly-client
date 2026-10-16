@@ -21,7 +21,7 @@ interface Session extends Saved {
   setTemplateId: (value: string) => void;
 }
 
-const KEY = 'fitly.session';
+const KEY = 'fitly.session.V3';
 const EMPTY: Saved = { jobText: '', result: null, templateId: null };
 
 // A tailor run costs model quota, so a refresh should not throw the result away.
