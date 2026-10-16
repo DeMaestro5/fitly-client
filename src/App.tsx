@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { ResultPage } from './pages/ResultPage';
 import { TailorPage } from './pages/TailorPage';
 import { ResumeSessionProvider } from './state/session';
+import { MasterResumePage } from './pages/MasterResume';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Routes>
         <Route path='/' element={<TailorPage />} />
         <Route path='/result' element={<ResultPage />} />
+        <Route path='/master' element={<MasterResumePage />} />
         <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </ResumeSessionProvider>

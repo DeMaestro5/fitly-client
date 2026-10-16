@@ -1,5 +1,12 @@
 import { parseTailorResponse } from '../lib/tailor-result';
-import type { RenderRequest, TailorResult, Template } from './types';
+import { parseMasterResponse, parseImportResponse } from '../lib/master-resume';
+import type {
+  ImportResult,
+  MasterResume,
+  RenderRequest,
+  TailorResult,
+  Template,
+} from './types';
 
 export class ApiError extends Error {
   status: number;
@@ -91,6 +98,57 @@ export async function fetchPdf(
   request: RenderRequest
 ): Promise<{ blob: Blob; fileName: string }> {
   const response = await send('/api/render', json(request));
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const fileName =
+    /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? 'Resume.pdf';
+  return { blob: await response.blob(), fileName };
+}
+
+export async function fetchMaster(signal?: AbortSignal): Promise<MasterResume> {
+  const response = await send('/api/master-resume', { signal });
+  return parseMasterResponse(await response.json());
+}
+
+export async function saveMaster(master: MasterResume): Promise<void> {
+  await send('/api/master-resume', { ...json(master), method: 'PUT' });
+}
+
+/** Sends the PDF itself as the request body; the server reads it and returns a draft. */
+export async function importResume(
+  file: File,
+  signal?: AbortSignal
+): Promise<ImportResult> {
+  const response = await send('/api/master-resume/import', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/pdf' },
+    body: file,
+    signal,
+  });
+  return parseImportResponse(await response.json());
+}
+
+/** HTML of an unsaved draft, rendered by the backend with the chosen template. */
+export async function fetchDraftPreview(
+  resume: MasterResume,
+  templateId: string,
+  signal?: AbortSignal
+): Promise<string> {
+  const response = await send(
+    '/api/master-resume/preview',
+    json({ resume, templateId }, signal)
+  );
+  return response.text();
+}
+
+/** PDF of an unsaved draft. */
+export async function fetchDraftPdf(
+  resume: MasterResume,
+  templateId: string
+): Promise<{ blob: Blob; fileName: string }> {
+  const response = await send(
+    '/api/master-resume/pdf',
+    json({ resume, templateId })
+  );
   const disposition = response.headers.get('Content-Disposition') ?? '';
   const fileName =
     /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? 'Resume.pdf';

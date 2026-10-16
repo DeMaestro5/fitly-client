@@ -1,4 +1,4 @@
-import type { Gaps, Tailorable, TailorResult } from '../api/types';
+import type { Gaps, Tailorable, TailorResult, Fit } from '../api/types';
 
 type Dict = Record<string, unknown>;
 
@@ -27,19 +27,32 @@ function isTailorable(value: unknown): value is Tailorable {
 
 function toGaps(value: unknown): Gaps | null {
   if (!isDict(value)) return null;
-  const matched = toStrings(value.matched ?? value.matchedTechnologies);
-  const missing = toStrings(value.missing ?? value.missingTechnologies);
-  const raw = value.coverage ?? value.coveragePercent ?? value.coveragePct;
+  const coverage =
+    typeof value.coverage === 'number' && Number.isFinite(value.coverage)
+      ? Math.min(100, Math.max(0, Math.round(value.coverage)))
+      : null;
+  const required = isDict(value.required) ? value.required : {};
+  const preferred = isDict(value.preferred) ? value.preferred : {};
+  return {
+    matched: [...toStrings(required.matched), ...toStrings(preferred.matched)],
+    missing: [...toStrings(required.missing), ...toStrings(preferred.missing)],
+    coverage,
+  };
+}
 
-  let coverage: number | null = null;
-  if (typeof raw === 'number' && Number.isFinite(raw)) {
-    coverage = Math.round(raw <= 1 ? raw * 100 : raw);
-  } else if (matched.length + missing.length > 0) {
-    coverage = Math.round(
-      (matched.length / (matched.length + missing.length)) * 100
-    );
-  }
-  return { matched, missing, coverage };
+function toFit(value: unknown): Fit | null {
+  if (!isDict(value)) return null;
+  const { verdict, coverage, reason } = value;
+  if (verdict !== 'apply' && verdict !== 'maybe' && verdict !== 'skip')
+    return null;
+  return {
+    verdict,
+    coverage:
+      typeof coverage === 'number' && Number.isFinite(coverage)
+        ? Math.round(coverage)
+        : 0,
+    reason: typeof reason === 'string' ? reason : '',
+  };
 }
 
 /**
@@ -66,9 +79,18 @@ export function parseTailorResponse(raw: unknown): TailorResult {
     );
   }
 
+  const posting = isDict(body.posting) ? body.posting : undefined;
+
   return {
     tailorable,
     gaps: toGaps(body.gaps ?? body.gapsReport ?? body.gapReport),
     warnings: toStrings(body.warnings),
+    fit: toFit(body.fit),
+    constraints: toStrings(posting?.constraints),
+    suggestedFileName:
+      typeof body.suggestedFileName === 'string' &&
+      body.suggestedFileName.trim()
+        ? body.suggestedFileName
+        : 'Resume',
   };
 }
