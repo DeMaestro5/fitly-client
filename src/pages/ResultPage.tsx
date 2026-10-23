@@ -150,17 +150,27 @@ function Result({ result }: { result: TailorResult }) {
           </div>
 
           <div className='flex items-center gap-2'>
-            <div className='flex h-10 items-center rounded-xl bg-white ring-1 ring-inset ring-line transition focus-within:ring-2'>
-              <input
-                aria-label='File name'
-                value={fileName}
-                spellCheck={false}
-                onChange={(e) => setFileName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && download()}
-                className='h-full w-40 bg-transparent pl-3 text-sm outline-none sm:w-65 '
-              />
-              <span className='pr-3 text-sm text-muted'>.pdf</span>
-            </div>
+            <label className='flex h-10 min-w-0 cursor-text items-center rounded-md bg-white px-3 ring-1 ring-inset ring-line transition focus-within:ring-2 focus-within:ring-focus'>
+              {/* The hidden copy sizes the field to its text, so ".pdf" sits right after the name. */}
+              <span className='inline-grid min-w-[6rem] max-w-[14rem] grid-cols-[minmax(0,1fr)] sm:max-w-[28rem]'>
+                <span
+                  aria-hidden='true'
+                  className='invisible col-start-1 row-start-1 overflow-hidden whitespace-pre text-sm'
+                >
+                  {fileName || ' '}
+                </span>
+                <input
+                  aria-label='File name'
+                  value={fileName}
+                  spellCheck={false}
+                  onChange={(e) => setFileName(e.target.value)}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(e) => e.key === 'Enter' && download()}
+                  className='col-start-1 row-start-1 w-full min-w-0 bg-transparent text-sm outline-none'
+                />
+              </span>
+              <span className='text-sm text-muted'>.pdf</span>
+            </label>
             <Button
               disabled={!activeId}
               busy={pdf.status === 'working'}

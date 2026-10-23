@@ -5,6 +5,7 @@ import { ApiStatus } from './ApiStatus';
 const tabs = [
   { key: 'tailor', to: '/', label: 'Tailor' },
   { key: 'master', to: '/master', label: 'Master resume' },
+  { key: 'jobs', to: '/jobs', label: 'Jobs' },
 ];
 
 export function Header() {
@@ -13,8 +14,10 @@ export function Header() {
     pathname === '/' || pathname === '/result'
       ? 'tailor'
       : pathname === '/master'
-      ? 'master'
-      : null;
+        ? 'master'
+        : pathname === '/jobs'
+          ? 'jobs'
+          : null;
   const { ref, box, animate } = useIndicator<HTMLElement>(active);
 
   return (
