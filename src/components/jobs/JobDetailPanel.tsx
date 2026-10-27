@@ -16,8 +16,9 @@ import {
   ClockIcon,
   CoinIcon,
   ExternalIcon,
+  MailIcon,
   PinIcon,
-} from '../ui/icons';
+} from '../ui/Icons';
 import { CompanyAvatar } from './CompanyAvatar';
 import { DescriptionText } from './DescriptionText';
 import { ScoreRing } from './ScoreRing';
@@ -201,9 +202,19 @@ export function JobDetailPanel({
             rel='noopener noreferrer'
             className='inline-flex h-9 items-center gap-2 rounded-xl bg-ink px-3.5 text-sm font-medium text-white transition hover:opacity-90'
           >
-            Open job
+            {job.source === 'hn' ? 'Open post' : 'Open job'}
             <ExternalIcon className='h-4 w-4' />
           </a>
+          {job.applyEmail && (
+            <a
+              href={`mailto:${job.applyEmail}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
+              title={`Email ${job.applyEmail}`}
+              className='inline-flex h-9 max-w-[16rem] items-center gap-1.5 rounded-xl border border-black/[0.08] bg-white px-3 text-sm font-medium text-ink transition hover:border-black/25'
+            >
+              <MailIcon className='h-4 w-4 shrink-0' />
+              <span className='truncate'>{job.applyEmail}</span>
+            </a>
+          )}
           {ACTIONS.map((action) => {
             const active = job.status === action.status;
             return (

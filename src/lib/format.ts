@@ -14,6 +14,7 @@ export const SOURCE_LABELS: Record<JobSourceId, string> = {
 // Sources that exist today (shown in the filter).
 export const ACTIVE_SOURCES: JobSourceId[] = [
   'himalayas',
+  'hn',
   'remoteok',
   'wwr',
   'jobicy',

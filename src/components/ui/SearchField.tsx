@@ -1,4 +1,4 @@
-import { SearchIcon, XIcon } from './icons';
+import { SearchIcon, XIcon } from './Icons';
 
 interface Props {
   value: string;

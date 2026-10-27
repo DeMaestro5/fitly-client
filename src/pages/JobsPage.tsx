@@ -4,7 +4,7 @@ import { JobDetailPanel } from '../components/jobs/JobDetailPanel';
 import { JobFilters } from '../components/jobs/JobFilters';
 import { JobRow } from '../components/jobs/JobRow';
 import { SourceDots } from '../components/jobs/SourceDots';
-import { RefreshIcon, SearchIcon } from '../components/ui/icons';
+import { RefreshIcon, SearchIcon } from '../components/ui/Icons';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useJobDetail } from '../hooks/useJobDetail';
 import { useJobSources } from '../hooks/useJobSources';
@@ -13,7 +13,7 @@ import { timeAgo } from '../lib/format';
 import { DEFAULT_FILTERS, toQuery, type UiFilters } from '../lib/job-filters';
 
 const pagerButton =
-  'inline-flex h-9 items-center rounded-xl border border-black/[0.08] bg-white/80 px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-40';
+  'inline-flex h-9 items-center cursor-pointer rounded-xl border border-black/[0.08] bg-white/80 px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-40';
 
 export function JobsPage() {
   const [ui, setUi] = useState<UiFilters>(DEFAULT_FILTERS);

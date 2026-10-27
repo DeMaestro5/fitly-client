@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
-import { CheckIcon, ChevronIcon } from './icons';
+import { CheckIcon, ChevronIcon } from './Icons';
 
 export interface Option<T extends string> {
   value: T;

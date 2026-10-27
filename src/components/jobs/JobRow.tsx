@@ -22,7 +22,7 @@ export function JobRow({ job, index, selected, onSelect }: Props) {
       aria-pressed={selected}
       onClick={() => onSelect(job.id)}
       style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
-      className={`fade-up relative block w-full rounded-xl border bg-white/90 px-4 py-3 text-left outline-none transition duration-150 hover:border-black/25 focus-visible:ring-4 focus-visible:ring-black/[0.08] ${
+      className={`fade-up relative block w-full rounded-xl border bg-white/90 cursor-pointer px-4 py-3 text-left outline-none transition duration-150 hover:border-black/25 focus-visible:ring-4 focus-visible:ring-black/[0.08] ${
         selected ? 'border-ink shadow-sm' : 'border-black/[0.07]'
       } ${job.status === 'skipped' ? 'opacity-60 hover:opacity-100' : ''}`}
     >
@@ -51,6 +51,11 @@ export function JobRow({ job, index, selected, onSelect }: Props) {
         <span className='shrink-0'>
           <StatusBadge status={job.status} />
         </span>
+        {job.applyEmail && (
+          <span className='shrink-0'>
+            <Badge tone='sky'>Email</Badge>
+          </span>
+        )}
         {job.regionNote && (
           <span className='min-w-0 max-w-[11rem] shrink'>
             <Badge tone='amber'>{job.regionNote}</Badge>

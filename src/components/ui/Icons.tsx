@@ -79,3 +79,10 @@ export const CoinIcon = icon(
     <path d='M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5V8m0 8v1.5' />
   </>,
 );
+
+export const MailIcon = icon(
+  <>
+    <rect x='3' y='5' width='18' height='14' rx='2' />
+    <path d='m3 7 9 6 9-6' />
+  </>,
+);

@@ -17,6 +17,7 @@ export interface JobListItem {
   source: JobSourceId;
   sourceUrl: string;
   applyUrl: string;
+  applyEmail: string;
   title: string;
   company: string;
   location: string | null;
