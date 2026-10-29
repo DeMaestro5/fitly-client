@@ -13,7 +13,7 @@ import { useMasterResume } from '../hooks/useMasterResume';
 import { usePreview } from '../hooks/usePreview';
 import { useTemplates } from '../hooks/useTemplates';
 import { compareResumes } from '../lib/resume-diff';
-import { useResumeSession } from '../state/session';
+import { useResumeSession } from '../state/session-context';
 import { FitVerdict } from '../components/FitVerdict';
 import { LocationNote } from '../components/LocationNote';
 
@@ -36,7 +36,7 @@ function Result({ result }: { result: TailorResult }) {
   } = useMasterResume();
   const [tab, setTab] = useState<Tab>('preview');
   const [fileName, setFileName] = useState(
-    result.suggestedFileName ?? 'Resume'
+    result.suggestedFileName ?? 'Resume',
   );
   const { ref, box, animate } = useIndicator<HTMLDivElement>(tab);
 
@@ -69,7 +69,7 @@ function Result({ result }: { result: TailorResult }) {
       master
         ? compareResumes(master.tailorable, tailorable, master.locked)
         : null,
-    [master, tailorable]
+    [master, tailorable],
   );
 
   return (
@@ -195,8 +195,8 @@ function Result({ result }: { result: TailorResult }) {
               {pdf.status === 'working'
                 ? 'Preparing PDF'
                 : pdf.status === 'done'
-                ? 'Downloaded'
-                : 'Download PDF'}
+                  ? 'Downloaded'
+                  : 'Download PDF'}
             </Button>
           </div>
         </div>

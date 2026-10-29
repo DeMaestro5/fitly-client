@@ -18,7 +18,7 @@ import { useImport } from '../hooks/useImport';
 import { useMasterResume } from '../hooks/useMasterResume';
 import { useTemplates } from '../hooks/useTemplates';
 import { emptyMaster, withoutBlanks } from '../lib/master-draft';
-import { useResumeSession } from '../state/session';
+import { useResumeSession } from '../state/session-context';
 import { useConfirm } from '../components/ConfirmDialog';
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -75,7 +75,7 @@ function Workspace({
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [draft, setDraft] = useState<MasterResume | null>(() =>
-    saved ? structuredClone(saved) : null
+    saved ? structuredClone(saved) : null,
   );
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [view, setView] = useState<View>('live');
@@ -98,7 +98,7 @@ function Workspace({
         ? JSON.stringify(clean) !==
           JSON.stringify(saved ? withoutBlanks(saved) : null)
         : false,
-    [clean, saved]
+    [clean, saved],
   );
 
   const preview = useDraftPreview(clean, activeId, view === 'live');
@@ -107,7 +107,7 @@ function Workspace({
     () => () => {
       if (pdfUrl) URL.revokeObjectURL(pdfUrl);
     },
-    [pdfUrl]
+    [pdfUrl],
   );
 
   useEffect(() => {
@@ -183,7 +183,7 @@ function Workspace({
       setSaveState('saved');
     } catch (e) {
       setSaveError(
-        e instanceof Error ? e.message : 'Could not save your changes.'
+        e instanceof Error ? e.message : 'Could not save your changes.',
       );
       setSaveState('error');
     }
@@ -244,8 +244,8 @@ function Workspace({
         {pdf.status === 'working'
           ? 'Preparing PDF'
           : pdf.status === 'done'
-          ? 'Downloaded'
-          : 'Download PDF'}
+            ? 'Downloaded'
+            : 'Download PDF'}
       </Button>
       {picker}
     </div>

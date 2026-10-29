@@ -1,25 +1,12 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
 import type { TailorResult } from '../api/types';
-
-interface Saved {
-  jobText: string;
-  result: TailorResult | null;
-  templateId: string | null;
-}
-
-interface Session extends Saved {
-  setJobText: (value: string) => void;
-  setResult: (value: TailorResult | null) => void;
-  setTemplateId: (value: string) => void;
-}
+import { SessionContext, type Saved } from './session-context';
 
 const KEY = 'fitly.session.V3';
 const EMPTY: Saved = { jobText: '', result: null, templateId: null };
@@ -33,8 +20,6 @@ function load(): Saved {
     return EMPTY;
   }
 }
-
-const SessionContext = createContext<Session | null>(null);
 
 export function ResumeSessionProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<Saved>(load);
@@ -66,13 +51,4 @@ export function ResumeSessionProvider({ children }: { children: ReactNode }) {
   );
 
   return <SessionContext value={value}>{children}</SessionContext>;
-}
-
-export function useResumeSession(): Session {
-  const session = useContext(SessionContext);
-  if (!session)
-    throw new Error(
-      'useResumeSession must be used inside ResumeSessionProvider',
-    );
-  return session;
 }

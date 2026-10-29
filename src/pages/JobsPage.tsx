@@ -273,7 +273,7 @@ export function JobsPage() {
           )}
         </section>
 
-        <aside className='lg:sticky lg:top-24 lg:self-start'>
+        <aside className='lg:sticky lg:top-48 lg:self-start'>
           <JobDetailPanel
             listItem={listItem}
             detail={detail.job}

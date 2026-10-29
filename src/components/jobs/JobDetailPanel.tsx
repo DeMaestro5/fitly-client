@@ -22,6 +22,7 @@ import {
 import { CompanyAvatar } from './CompanyAvatar';
 import { DescriptionText } from './DescriptionText';
 import { ScoreRing } from './ScoreRing';
+import { EmailDraftPanel } from './EmailDraftPanel';
 
 interface Props {
   listItem: JobListItem | null;
@@ -140,7 +141,7 @@ export function JobDetailPanel({
   return (
     <article
       key={job.id}
-      className='fade-up flex max-h-[calc(100vh-7.5rem)] flex-col overflow-hidden rounded-2xl border border-black/[0.07] bg-white shadow-md'
+      className='fade-up flex max-h-[calc(100vh-13rem)] flex-col overflow-hidden rounded-2xl border border-black/[0.07] bg-white shadow-md'
     >
       <div className='border-b border-black/[0.06] bg-gradient-to-br from-amber-50 via-white to-white p-5'>
         <div className='flex items-start gap-4'>
@@ -251,6 +252,14 @@ export function JobDetailPanel({
           >
             {actionError}
           </p>
+        )}
+        {job.applyEmail && (
+          <div className='mb-4'>
+            <EmailDraftPanel
+              jobId={job.id}
+              onOpenedMail={() => onOpened(job)}
+            />
+          </div>
         )}
 
         <NotesEditor

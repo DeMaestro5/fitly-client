@@ -54,7 +54,7 @@ async function send(path: string, init: RequestInit): Promise<Response> {
   if (!message && response.status >= 500) message = UNREACHABLE;
   throw new ApiError(
     message ?? `Request failed (${response.status}).`,
-    response.status
+    response.status,
   );
 }
 
@@ -66,7 +66,7 @@ const json = (body: unknown, signal?: AbortSignal): RequestInit => ({
 });
 
 export async function fetchTemplates(
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<Template[]> {
   const response = await send('/api/templates', { signal });
   return (await response.json()) as Template[];
@@ -74,7 +74,7 @@ export async function fetchTemplates(
 
 export async function tailorResume(
   jobText: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<TailorResult> {
   // The API accepts the pasted page as plain text, so no field names to guess.
   const response = await send('/api/tailor', {
@@ -88,14 +88,14 @@ export async function tailorResume(
 
 export async function fetchPreview(
   request: RenderRequest,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<string> {
   const response = await send('/api/render/preview', json(request, signal));
   return response.text();
 }
 
 export async function fetchPdf(
-  request: RenderRequest
+  request: RenderRequest,
 ): Promise<{ blob: Blob; fileName: string }> {
   const response = await send('/api/render', json(request));
   const disposition = response.headers.get('Content-Disposition') ?? '';
@@ -116,7 +116,7 @@ export async function saveMaster(master: MasterResume): Promise<void> {
 /** Sends the PDF itself as the request body; the server reads it and returns a draft. */
 export async function importResume(
   file: File,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ImportResult> {
   const response = await send('/api/master-resume/import', {
     method: 'POST',
@@ -131,11 +131,11 @@ export async function importResume(
 export async function fetchDraftPreview(
   resume: MasterResume,
   templateId: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<string> {
   const response = await send(
     '/api/master-resume/preview',
-    json({ resume, templateId }, signal)
+    json({ resume, templateId }, signal),
   );
   return response.text();
 }
@@ -143,14 +143,31 @@ export async function fetchDraftPreview(
 /** PDF of an unsaved draft. */
 export async function fetchDraftPdf(
   resume: MasterResume,
-  templateId: string
+  templateId: string,
 ): Promise<{ blob: Blob; fileName: string }> {
   const response = await send(
     '/api/master-resume/pdf',
-    json({ resume, templateId })
+    json({ resume, templateId }),
   );
   const disposition = response.headers.get('Content-Disposition') ?? '';
   const fileName =
     /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? 'Resume.pdf';
   return { blob: await response.blob(), fileName };
+}
+
+export interface JobEmailDraft {
+  to: string;
+  subject: string;
+  body: string;
+}
+
+export async function draftJobEmail(
+  jobId: string,
+  signal?: AbortSignal,
+): Promise<JobEmailDraft> {
+  const response = await send(`/api/jobs/${encodeURIComponent(jobId)}/email`, {
+    method: 'POST',
+    signal,
+  });
+  return (await response.json()) as JobEmailDraft;
 }

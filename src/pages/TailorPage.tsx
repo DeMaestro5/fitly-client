@@ -4,7 +4,7 @@ import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
 import { TailoringSheet } from '../components/TailoringSheet';
 import { useTailor } from '../hooks/useTailor';
-import { useResumeSession } from '../state/session';
+import { useResumeSession } from '../state/session-context';
 
 const MIN_LENGTH = 40;
 const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent);

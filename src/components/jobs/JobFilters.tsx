@@ -48,7 +48,7 @@ export function JobFilters({ value, onChange }: Props) {
   );
 
   return (
-    <div className='relative z-20 rounded-2xl border border-black/[0.07] bg-white/70 p-3 shadow-sm backdrop-blur'>
+    <div className='relative z-30 rounded-2xl border border-black/[0.07] bg-white/70 p-3 shadow-sm backdrop-blur lg:sticky lg:top-16'>
       <SearchField
         value={value.q}
         onChange={(q) => onChange({ q })}
