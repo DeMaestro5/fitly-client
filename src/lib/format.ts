@@ -20,6 +20,7 @@ export const ACTIVE_SOURCES: JobSourceId[] = [
   'jobicy',
   'remotive',
   'arbeitnow',
+  'ats',
 ];
 
 export type ScoreBand = 'strong' | 'possible' | 'low';

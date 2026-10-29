@@ -7,6 +7,7 @@ export type JobSourceId =
   | 'arbeitnow'
   | 'hn'
   | 'ats';
+
 export type JobStatus = 'new' | 'saved' | 'applied' | 'skipped';
 export type RemoteType = 'remote' | 'hybrid' | 'onsite' | 'unknown';
 export type JobScope = 'worldwide' | 'limited' | 'unknown';

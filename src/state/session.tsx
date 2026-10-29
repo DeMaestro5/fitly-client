@@ -49,20 +49,20 @@ export function ResumeSessionProvider({ children }: { children: ReactNode }) {
 
   const setJobText = useCallback(
     (jobText: string) => setSaved((s) => ({ ...s, jobText })),
-    []
+    [],
   );
   const setResult = useCallback(
     (result: TailorResult | null) => setSaved((s) => ({ ...s, result })),
-    []
+    [],
   );
   const setTemplateId = useCallback(
     (templateId: string) => setSaved((s) => ({ ...s, templateId })),
-    []
+    [],
   );
 
   const value = useMemo(
     () => ({ ...saved, setJobText, setResult, setTemplateId }),
-    [saved, setJobText, setResult, setTemplateId]
+    [saved, setJobText, setResult, setTemplateId],
   );
 
   return <SessionContext value={value}>{children}</SessionContext>;
@@ -72,7 +72,7 @@ export function useResumeSession(): Session {
   const session = useContext(SessionContext);
   if (!session)
     throw new Error(
-      'useResumeSession must be used inside ResumeSessionProvider'
+      'useResumeSession must be used inside ResumeSessionProvider',
     );
   return session;
 }

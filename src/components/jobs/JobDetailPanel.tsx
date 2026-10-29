@@ -32,6 +32,7 @@ interface Props {
   actionError: string | null;
   onStatus: (status: JobStatus) => void;
   onNotes: (notes: string | null) => void;
+  onOpened: (job: JobListItem) => void;
 }
 
 const ACTIONS: {
@@ -115,6 +116,7 @@ export function JobDetailPanel({
   actionError,
   onStatus,
   onNotes,
+  onOpened,
 }: Props) {
   const job = detail ?? listItem; // show list data instantly, the description follows
   if (!job) {
@@ -199,6 +201,7 @@ export function JobDetailPanel({
           <a
             href={job.applyUrl}
             target='_blank'
+            onClick={() => onOpened(job)}
             rel='noopener noreferrer'
             className='inline-flex h-9 items-center gap-2 rounded-xl bg-ink px-3.5 text-sm font-medium text-white transition hover:opacity-90'
           >
@@ -209,6 +212,7 @@ export function JobDetailPanel({
             <a
               href={`mailto:${job.applyEmail}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
               title={`Email ${job.applyEmail}`}
+              onClick={() => onOpened(job)}
               className='inline-flex h-9 max-w-[16rem] items-center gap-1.5 rounded-xl border border-black/[0.08] bg-white px-3 text-sm font-medium text-ink transition hover:border-black/25'
             >
               <MailIcon className='h-4 w-4 shrink-0' />

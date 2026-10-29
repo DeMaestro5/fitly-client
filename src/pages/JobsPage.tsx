@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { updateJob, type JobStatus } from '../api/jobs';
+import { ApplyPrompt } from '../components/jobs/ApplyPrompt';
 import { JobDetailPanel } from '../components/jobs/JobDetailPanel';
 import { JobFilters } from '../components/jobs/JobFilters';
 import { JobRow } from '../components/jobs/JobRow';
@@ -11,25 +12,61 @@ import { useJobSources } from '../hooks/useJobSources';
 import { useJobs } from '../hooks/useJobs';
 import { timeAgo } from '../lib/format';
 import { DEFAULT_FILTERS, toQuery, type UiFilters } from '../lib/job-filters';
+import { useJobsView } from '../state/jobs-view-context';
 
 const pagerButton =
-  'inline-flex h-9 items-center cursor-pointer rounded-xl border border-black/[0.08] bg-white/80 px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-40';
+  'inline-flex h-9 items-center rounded-xl border border-black/[0.08] bg-white px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-40';
 
 export function JobsPage() {
-  const [ui, setUi] = useState<UiFilters>(DEFAULT_FILTERS);
+  const {
+    ui,
+    setUi,
+    selectedId,
+    setSelectedId,
+    pending,
+    setPending,
+    getScrollY,
+    rememberScroll,
+  } = useJobsView();
   const debouncedQ = useDebouncedValue(ui.q);
   const query = useMemo(() => toQuery(ui, debouncedQ), [ui, debouncedQ]);
 
   const jobs = useJobs(query);
   const sources = useJobSources();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const detail = useJobDetail(selectedId);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  // Remember where the page is scrolled (saved shortly after scrolling stops).
+  useEffect(() => {
+    let timer: number | undefined;
+    const onScroll = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => rememberScroll(window.scrollY), 150);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [rememberScroll]);
+
+  // Once the list has loaded, go back to where the page was left.
+  const scrollRestored = useRef(false);
+  useEffect(() => {
+    if (scrollRestored.current || !jobs.data) return;
+    scrollRestored.current = true;
+    window.scrollTo(0, getScrollY());
+  }, [jobs.data, getScrollY]);
+
   // Any filter change goes back to page 1; a page change passes page explicitly.
   const update = (patch: Partial<UiFilters>) =>
     setUi((prev) => ({ ...prev, page: 1, ...patch }));
+
+  const goToPage = (page: number) => {
+    update({ page });
+    window.scrollTo({ top: 0 });
+  };
 
   const listItem = jobs.data?.items.find((j) => j.id === selectedId) ?? null;
 
@@ -45,6 +82,22 @@ export function JobsPage() {
       setActionError(err instanceof Error ? err.message : 'Could not save');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function confirmApplied() {
+    if (!pending) return;
+    const { id } = pending;
+    setPending(null);
+    setActionError(null);
+    try {
+      const updated = await updateJob(id, { status: 'applied' });
+      jobs.replaceItem(updated);
+      if (id === selectedId) detail.setJob(updated); // only for the job being shown
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Could not mark as applied',
+      );
     }
   }
 
@@ -191,26 +244,27 @@ export function JobsPage() {
             </ul>
           )}
 
+          {/* Sticky: stays at the bottom of the screen while you scroll the list. */}
           {data && data.totalPages > 1 && (
             <nav
-              className='mt-4 flex items-center justify-between text-sm text-muted'
               aria-label='Pages'
+              className='sticky bottom-4 z-20 mt-4 flex items-center justify-between rounded-2xl border border-black/[0.08] bg-white/90 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur'
             >
               <button
                 type='button'
                 disabled={data.page <= 1 || jobs.loading}
-                onClick={() => update({ page: data.page - 1 })}
+                onClick={() => goToPage(data.page - 1)}
                 className={pagerButton}
               >
                 Previous
               </button>
-              <span>
+              <span className='text-sm text-muted'>
                 Page {data.page} of {data.totalPages}
               </span>
               <button
                 type='button'
                 disabled={data.page >= data.totalPages || jobs.loading}
-                onClick={() => update({ page: data.page + 1 })}
+                onClick={() => goToPage(data.page + 1)}
                 className={pagerButton}
               >
                 Next
@@ -229,9 +283,27 @@ export function JobsPage() {
             actionError={actionError}
             onStatus={(status) => void save({ status })}
             onNotes={(notes) => void save({ notes })}
+            onOpened={(job) => {
+              if (job.status !== 'applied') {
+                setPending({
+                  id: job.id,
+                  title: job.title,
+                  company: job.company,
+                });
+              }
+            }}
           />
         </aside>
       </div>
+
+      {pending && (
+        <ApplyPrompt
+          title={pending.title}
+          company={pending.company}
+          onYes={() => void confirmApplied()}
+          onNo={() => setPending(null)}
+        />
+      )}
     </div>
   );
 }
