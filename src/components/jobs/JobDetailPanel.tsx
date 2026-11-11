@@ -34,6 +34,7 @@ interface Props {
   onStatus: (status: JobStatus) => void;
   onNotes: (notes: string | null) => void;
   onOpened: (job: JobListItem) => void;
+  onTailor: (job: JobDetail) => void;
 }
 
 const ACTIONS: {
@@ -118,6 +119,7 @@ export function JobDetailPanel({
   onStatus,
   onNotes,
   onOpened,
+  onTailor,
 }: Props) {
   const job = detail ?? listItem; // show list data instantly, the description follows
   if (!job) {
@@ -220,6 +222,21 @@ export function JobDetailPanel({
               <span className='truncate'>{job.applyEmail}</span>
             </a>
           )}
+
+          <button
+            type='button'
+            disabled={!detail}
+            onClick={() => detail && onTailor(detail)}
+            title={
+              detail
+                ? 'Open the Tailor page with this job filled in'
+                : 'Loading the job description…'
+            }
+            className='inline-flex h-10 items-center gap-1.5 rounded-xl border border-black/[0.08] bg-white px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-50'
+          >
+            Tailor resume
+          </button>
+
           {ACTIONS.map((action) => {
             const active = job.status === action.status;
             return (

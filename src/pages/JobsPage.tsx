@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { updateJob, type JobStatus } from '../api/jobs';
 import { ApplyPrompt } from '../components/jobs/ApplyPrompt';
 import { JobDetailPanel } from '../components/jobs/JobDetailPanel';
 import { JobFilters } from '../components/jobs/JobFilters';
@@ -13,6 +12,10 @@ import { useJobs } from '../hooks/useJobs';
 import { timeAgo } from '../lib/format';
 import { DEFAULT_FILTERS, toQuery, type UiFilters } from '../lib/job-filters';
 import { useJobsView } from '../state/jobs-view-context';
+import { useNavigate } from 'react-router-dom';
+import { updateJob, type JobDetail, type JobStatus } from '../api/jobs';
+import { buildTailorText } from '../lib/tailor-text';
+import { useResumeSession } from '../state/session-context';
 
 const pagerButton =
   'inline-flex h-9 items-center rounded-xl border border-black/[0.08] bg-white px-3.5 text-sm font-medium text-ink transition hover:border-black/25 disabled:opacity-40';
@@ -36,6 +39,14 @@ export function JobsPage() {
   const detail = useJobDetail(selectedId);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const { setJobText } = useResumeSession();
+
+  function openInTailor(job: JobDetail) {
+    setJobText(buildTailorText(job));
+    navigate('/');
+  }
 
   // Remember where the page is scrolled (saved shortly after scrolling stops).
   useEffect(() => {
@@ -292,6 +303,7 @@ export function JobsPage() {
                 });
               }
             }}
+            onTailor={openInTailor}
           />
         </aside>
       </div>
