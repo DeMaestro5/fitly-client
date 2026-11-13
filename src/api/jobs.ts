@@ -6,7 +6,8 @@ export type JobSourceId =
   | 'jobicy'
   | 'arbeitnow'
   | 'hn'
-  | 'ats';
+  | 'ats'
+  | 'mercor';
 
 export type JobStatus = 'new' | 'saved' | 'applied' | 'skipped';
 export type RemoteType = 'remote' | 'hybrid' | 'onsite' | 'unknown';

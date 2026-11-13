@@ -9,6 +9,7 @@ export const SOURCE_LABELS: Record<JobSourceId, string> = {
   arbeitnow: 'Arbeitnow',
   hn: 'Hacker News',
   ats: 'Company board',
+  mercor: 'Mercor',
 };
 
 // Sources that exist today (shown in the filter).
@@ -21,6 +22,7 @@ export const ACTIVE_SOURCES: JobSourceId[] = [
   'remotive',
   'arbeitnow',
   'ats',
+  'mercor',
 ];
 
 export type ScoreBand = 'strong' | 'possible' | 'low';
